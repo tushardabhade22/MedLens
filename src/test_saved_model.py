@@ -1,8 +1,8 @@
+
 import joblib
 
-# Load saved model
-model = joblib.load("../models/report_classifier.pkl")
-tfidf = joblib.load("../models/tfidf_vectorizer.pkl")
+# Load combined MedLens model
+model = joblib.load("../models/medlens_model.pkl")
 
 print("Medical Report Classifier")
 print("Type 'exit' to stop.")
@@ -15,14 +15,11 @@ while True:
     if report.lower() == "exit":
         break
 
-    # Convert report to TF-IDF
-    report_tfidf = tfidf.transform([report])
-
     # Predict category
-    prediction = model.predict(report_tfidf)[0]
+    prediction = model.predict([report])[0]
 
     # Get confidence
-    probability = model.predict_proba(report_tfidf)[0]
+    probability = model.predict_proba([report])[0]
     confidence = probability.max()
 
     print("\nPredicted Report Type:", prediction)

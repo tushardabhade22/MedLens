@@ -5,7 +5,6 @@ from pypdf import PdfReader
 def clean_text(text):
     text = text.lower()
 
-    # Keep only useful medical keywords
     keywords = [
         "cbc",
         "hemoglobin",
@@ -76,9 +75,8 @@ def clean_text(text):
     return " ".join(useful_text)
 
 
-# Load saved model and TF-IDF vectorizer
-model = joblib.load("../models/report_classifier.pkl")
-tfidf = joblib.load("../models/tfidf_vectorizer.pkl")
+# Load combined MedLens model
+model = joblib.load("../models/medlens_model.pkl")
 
 
 # Ask user for PDF path
@@ -109,16 +107,12 @@ print("\n========== CLEANED MEDICAL TEXT ==========\n")
 print(cleaned_text)
 
 
-# Convert cleaned text to TF-IDF
-text_tfidf = tfidf.transform([cleaned_text])
-
-
 # Predict report category
-prediction = model.predict(text_tfidf)[0]
+prediction = model.predict([cleaned_text])[0]
 
 
 # Get confidence
-probability = model.predict_proba(text_tfidf)[0]
+probability = model.predict_proba([cleaned_text])[0]
 confidence = probability.max()
 
 

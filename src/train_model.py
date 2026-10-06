@@ -4,6 +4,7 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
 
 
@@ -24,21 +25,19 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-# TF-IDF
-tfidf = TfidfVectorizer()
+# Create combined TF-IDF + Logistic Regression model
+model = Pipeline([
+    ("tfidf", TfidfVectorizer()),
+    ("classifier", LogisticRegression(max_iter=1000))
+])
 
-X_train_tfidf = tfidf.fit_transform(X_train)
-X_test_tfidf = tfidf.transform(X_test)
 
-
-# Train Logistic Regression
-model = LogisticRegression(max_iter=1000)
-
-model.fit(X_train_tfidf, y_train)
+# Train model
+model.fit(X_train, y_train)
 
 
 # Test model
-y_pred = model.predict(X_test_tfidf)
+y_pred = model.predict(X_test)
 
 accuracy = accuracy_score(y_test, y_pred)
 
@@ -48,9 +47,12 @@ print("\nClassification Report:")
 print(classification_report(y_test, y_pred))
 
 
-# Save model and TF-IDF vectorizer
-joblib.dump(model, "../models/report_classifier.pkl")
-joblib.dump(tfidf, "../models/tfidf_vectorizer.pkl")
+# Save combined model with compression
+joblib.dump(
+    model,
+    "../models/medlens_model.pkl",
+    compress=3
+)
 
-print("\nModel saved successfully!")
-print("TF-IDF vectorizer saved successfully!")
+print("\nMedLens model saved successfully!")
+print("File: models/medlens_model.pkl")

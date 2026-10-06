@@ -1,3 +1,4 @@
+
 import os
 import joblib
 
@@ -5,14 +6,15 @@ from pypdf import PdfReader
 from docx import Document
 from PIL import Image
 import pytesseract
+
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 
 # =========================================================
 # LOAD MODEL 1
 # =========================================================
 
-model = joblib.load("../models/report_classifier.pkl")
-tfidf = joblib.load("../models/tfidf_vectorizer.pkl")
+model = joblib.load("../models/medlens_model.pkl")
 
 
 # =========================================================
@@ -90,14 +92,11 @@ def extract_text(file_path):
 
 def predict_report_type(text):
 
-    # Convert extracted text into TF-IDF features
-    text_tfidf = tfidf.transform([text])
-
-    # Predict report category
-    prediction = model.predict(text_tfidf)[0]
+    # Predict directly using combined TF-IDF + Logistic Regression model
+    prediction = model.predict([text])[0]
 
     # Get prediction probabilities
-    probability = model.predict_proba(text_tfidf)[0]
+    probability = model.predict_proba([text])[0]
 
     # Highest probability
     confidence = probability.max()
